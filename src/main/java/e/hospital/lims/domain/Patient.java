@@ -6,6 +6,8 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.util.List;
+
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
@@ -30,4 +32,7 @@ public class Patient {
 
     @Column(name = "initial_symptoms")
     private String initialSymptoms;
+
+    @OneToMany(cascade = CascadeType.ALL)
+    private List<LabTestResult> labTestResult;
 }

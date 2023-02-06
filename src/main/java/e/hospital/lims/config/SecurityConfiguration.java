@@ -3,7 +3,7 @@ package e.hospital.lims.config;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.SneakyThrows;
 import org.springframework.beans.factory.annotation.Autowired;
-import e.hospital.lims.service.UserService;
+import e.hospital.lims.service.UserServiceImpl;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -20,7 +20,7 @@ import org.springframework.security.web.SecurityFilterChain;
 public class SecurityConfiguration {
 
     @Autowired
-    private UserService customUserDetailsService;
+    private UserServiceImpl customUserDetailsService;
 
     @SneakyThrows
     @Bean
@@ -34,7 +34,7 @@ public class SecurityConfiguration {
                 .authenticationEntryPoint((req, rsp, e) -> rsp.sendError(HttpServletResponse.SC_UNAUTHORIZED))
                 .and()
                 .authorizeHttpRequests((requests) -> requests
-                        .requestMatchers("")
+                        .requestMatchers("/api/**")
                         .permitAll()
                         .anyRequest()
                         .authenticated())

@@ -1,9 +1,6 @@
 package e.hospital.lims.domain;
 
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.Id;
-import jakarta.persistence.Table;
+import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -22,6 +19,7 @@ import java.util.Collection;
 public class User implements UserDetails {
 
     @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "user_id")
     private Long userId;
 
@@ -30,6 +28,10 @@ public class User implements UserDetails {
 
     @Column(name = "password")
     private String password;
+
+    @Column(name = "login_as")
+    @Enumerated(EnumType.ORDINAL)
+    private SystemRole role;
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {

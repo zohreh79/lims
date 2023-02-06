@@ -1,49 +1,16 @@
 package e.hospital.lims.service;
 
-import io.jsonwebtoken.Claims;
-import io.jsonwebtoken.JwtException;
-import io.jsonwebtoken.Jwts;
-import io.jsonwebtoken.SignatureAlgorithm;
-import org.springframework.stereotype.Service;
+import e.hospital.lims.domain.SystemRole;
+import e.hospital.lims.model.UserRequestModel;
+import e.hospital.lims.model.UserResponseModel;
 
-import java.util.Date;
+public interface AuthenticationService {
 
-@Service
-public class AuthenticationService {
+    String generateAccessToken(String username, SystemRole role);
 
-    private static final String SECRET = "secret";
+    String generateRefreshToken(String username, SystemRole role);
 
-    public String generateAccessToken(String username) {
-        return generateToken(username, 1800);
-    }
+    boolean isTokenValid(String token);
 
-    public String generateRefreshToken(String username) {
-        long refreshTime = 3000;
-        return generateToken(username, refreshTime);
-    }
-
-    public boolean isTokenValid(String token) {
-        try {
-            Claims claims = getAllClaimsFromToken(token);
-            return claims.getExpiration().after(new Date());
-        } catch (IllegalArgumentException | JwtException e) {
-            return false;
-        }
-    }
-
-    private Claims getAllClaimsFromToken(String token) {
-        return Jwts.parser()
-                .setSigningKey(SECRET)
-                .parseClaimsJws(token)
-                .getBody();
-    }
-
-    private String generateToken(String subject, long expirationInSeconds) {
-        return Jwts.builder()
-                .setSubject(subject)
-                .signWith(SignatureAlgorithm.HS512, SECRET)
-                .setIssuedAt(new Date(System.currentTimeMillis()))
-                .setExpiration(new Date(System.currentTimeMillis() + expirationInSeconds * 1000))
-                .compact();
-    }
+    UserResponseModel register(UserRequestModel model);
 }
