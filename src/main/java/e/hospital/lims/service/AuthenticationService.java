@@ -13,4 +13,8 @@ public interface AuthenticationService {
     boolean isTokenValid(String token);
 
     UserResponseModel register(UserRequestModel model);
+
+    UserResponseModel login(UserRequestModel model);
+
+    SystemRole authenticate(UserRequestModel loginModel);
 }

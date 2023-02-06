@@ -1,4 +1,4 @@
-package e.hospital.lims.service;
+package e.hospital.lims.service.impl;
 
 import e.hospital.lims.dao.UserDao;
 import e.hospital.lims.domain.User;

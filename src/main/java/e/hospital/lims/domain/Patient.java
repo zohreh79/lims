@@ -33,6 +33,7 @@ public class Patient {
     @Column(name = "initial_symptoms")
     private String initialSymptoms;
 
-    @OneToMany(cascade = CascadeType.ALL)
-    private List<LabTestResult> labTestResult;
+    @OneToMany
+    @JoinColumn(name = "result_id")
+    private List<LabTestResult> items;
 }

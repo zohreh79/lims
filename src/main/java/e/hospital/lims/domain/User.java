@@ -33,6 +33,11 @@ public class User implements UserDetails {
     @Enumerated(EnumType.ORDINAL)
     private SystemRole role;
 
+    @OneToOne(cascade = CascadeType.ALL)
+    @JoinColumn(name = "doctor_id", referencedColumnName = "user_id")
+    private Doctor doctor;
+
+
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
         return null;

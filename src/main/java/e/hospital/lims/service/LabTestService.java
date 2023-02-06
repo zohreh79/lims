@@ -1,4 +1,4 @@
 package e.hospital.lims.service;
 
-public class LabTestServiceImpl {
+public interface LabTestService {
 }
