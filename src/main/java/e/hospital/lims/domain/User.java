@@ -33,8 +33,8 @@ public class User implements UserDetails {
     @Enumerated(EnumType.ORDINAL)
     private SystemRole role;
 
-    @OneToOne(cascade = CascadeType.ALL)
-    @JoinColumn(name = "doctor_id", referencedColumnName = "user_id")
+    @OneToOne(mappedBy = "user", cascade = CascadeType.ALL)
+    @PrimaryKeyJoinColumn
     private Doctor doctor;
 
 

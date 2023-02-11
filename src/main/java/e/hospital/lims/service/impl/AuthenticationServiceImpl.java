@@ -28,7 +28,7 @@ import java.util.Map;
 @Service
 public class AuthenticationServiceImpl implements AuthenticationService {
 
-    private static final String SECRET = "secret";
+    private static final String SECRET = "LIMS-SECRET";
 
     @Autowired
     private UserDao userDao;
@@ -62,13 +62,15 @@ public class AuthenticationServiceImpl implements AuthenticationService {
 
     @Override
     public UserResponseModel register(UserRequestModel model) {
-        User user = new User();
-        user.setUsername(model.getUsername());
-        user.setPassword(passwordEncoder.encode(model.getPassword()));
+        var user = User.builder()
+                .username(model.getUsername())
+                .password(passwordEncoder.encode(model.getPassword()))
+                .role(model.getLoginAs())
+                .build();
         try {
             userDao.save(user);
         } catch (Exception e) {
-            throw new BadCredentialsException("");
+            throw new BadCredentialsException("error on creating user!");
         }
         return UserResponseModel
                 .from(generateAccessToken(model.getUsername(), model.getLoginAs())

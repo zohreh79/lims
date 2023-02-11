@@ -23,7 +23,9 @@ public class Doctor {
     @Column(name = "name")
     private String name;
 
-    @OneToOne(mappedBy = "doctor")
+    @OneToOne
+    @MapsId
+    @JoinColumn(name = "user_id")
     private User user;
 
     @OneToMany

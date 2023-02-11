@@ -3,14 +3,15 @@ package e.hospital.lims.domain;
 import jakarta.persistence.*;
 import lombok.*;
 
-@EqualsAndHashCode(callSuper = true)
+import java.util.List;
+
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
 @Data
 @Entity
 @Table(name = "lab_test_result")
-public class LabTestResult extends LabTests {
+public class LabTestResult {
 
     @Id
     @Column(name = "result_id")
@@ -22,9 +23,6 @@ public class LabTestResult extends LabTests {
     @Column(name = "test_status")
     private String testStatus;
 
-    @Column(name = "result")
-    private String result;
-
     @ManyToOne
     @JoinColumn(name = "patient_id", insertable = false, updatable = false)
     private Patient patient;
@@ -32,4 +30,7 @@ public class LabTestResult extends LabTests {
     @ManyToOne
     @JoinColumn(name = "doctor_id", insertable = false, updatable = false)
     private Doctor doctor;
+
+    @OneToMany
+    private List<LabTests> testFields;
 }
