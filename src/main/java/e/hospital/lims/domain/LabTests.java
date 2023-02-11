@@ -1,5 +1,6 @@
 package e.hospital.lims.domain;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.Data;
 
@@ -10,6 +11,7 @@ public class LabTests {
 
     @Id
     @Column(name = "field_id")
+    @JsonIgnore
     private Long fieldId;
 
     @Column(name = "test_name")
@@ -23,6 +25,7 @@ public class LabTests {
 
     @ManyToOne
     @JoinColumn(name = "result_id", insertable = false, updatable = false)
+    @JsonIgnore
     private LabTestResult results;
 
 }

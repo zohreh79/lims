@@ -1,5 +1,6 @@
 package e.hospital.lims.domain;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -35,5 +36,6 @@ public class Patient {
 
     @OneToMany
     @JoinColumn(name = "result_id")
+    @JsonIgnore
     private List<LabTestResult> items;
 }

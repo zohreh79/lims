@@ -6,7 +6,7 @@ import java.util.List;
 
 public interface LabTestService {
 
-    List<LabTestModel> getAllTests(String topic);
+    List<LabTestModel> getAllTests();
 
     LabTestModel getTestResult(Long patientId);
 

@@ -21,7 +21,8 @@ public class LabTestResult {
     private String description;
 
     @Column(name = "test_status")
-    private String testStatus;
+    @Enumerated(EnumType.ORDINAL)
+    private TestStatus testStatus;
 
     @ManyToOne
     @JoinColumn(name = "patient_id", insertable = false, updatable = false)

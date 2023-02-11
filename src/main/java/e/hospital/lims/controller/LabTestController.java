@@ -11,13 +11,12 @@ import java.util.List;
 @RestController
 @RequestMapping("/api/lab")
 public class LabTestController {
-
     @Autowired
     private LabTestService labTestService;
 
     @GetMapping("/list")
-    public List<LabTestModel> getLabTestList(@RequestParam(value = "topic", required = false) String topic) {
-        return labTestService.getAllTests(topic);
+    public List<LabTestModel> getLabTestList() {
+        return labTestService.getAllTests();
     }
 
     @GetMapping()
