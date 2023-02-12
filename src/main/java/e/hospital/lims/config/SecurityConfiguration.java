@@ -34,7 +34,7 @@ public class SecurityConfiguration {
                 .authenticationEntryPoint((req, rsp, e) -> rsp.sendError(HttpServletResponse.SC_UNAUTHORIZED))
                 .and()
                 .authorizeHttpRequests((requests) -> requests
-                        .requestMatchers("/api/**")
+                        .requestMatchers("/api/auth/**")
                         .permitAll()
                         .anyRequest()
                         .authenticated())

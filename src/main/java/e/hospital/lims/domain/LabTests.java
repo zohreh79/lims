@@ -12,7 +12,7 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @NoArgsConstructor
 @Entity
-@Table(name = "fields-result")
+@Table(name = "fields_result")
 public class LabTests {
 
     @Id
