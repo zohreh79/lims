@@ -60,6 +60,7 @@ public class AuthenticationServiceImpl implements AuthenticationService {
         }
     }
 
+
     @Override
     public UserResponseModel register(UserRequestModel model) {
         var user = User.builder()
@@ -88,7 +89,7 @@ public class AuthenticationServiceImpl implements AuthenticationService {
                         , generateRefreshToken(model.getUsername(), role));
     }
 
-    private Claims getAllClaimsFromToken(String token) {
+    public Claims getAllClaimsFromToken(String token) {
         return Jwts.parser()
                 .setSigningKey(SECRET)
                 .parseClaimsJws(token)

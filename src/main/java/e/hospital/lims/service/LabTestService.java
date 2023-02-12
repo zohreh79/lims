@@ -1,5 +1,6 @@
 package e.hospital.lims.service;
 
+import e.hospital.lims.domain.TestStatus;
 import e.hospital.lims.model.LabTestModel;
 
 import java.util.List;
@@ -14,7 +15,7 @@ public interface LabTestService {
 
     void setTestResult(LabTestModel model);
 
-    void updateTestResult(LabTestModel model);
+    void updateTestStatus(Long resultId, TestStatus testStatus);
 
 
 }

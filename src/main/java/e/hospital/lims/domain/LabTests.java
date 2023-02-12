@@ -2,30 +2,38 @@ package e.hospital.lims.domain;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
 @Data
+@Builder
+@AllArgsConstructor
+@NoArgsConstructor
 @Entity
-@Table(name = "test_fields")
+@Table(name = "fields-result")
 public class LabTests {
 
     @Id
-    @Column(name = "field_id")
+    @Column(name = "test_id")
     @JsonIgnore
-    private Long fieldId;
-
-    @Column(name = "test_name")
-    private String testName;
-
-    @Column(name = "normal_range")
-    private String range;
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long testId;
 
     @Column(name = "result")
-    private String result;
+    private String testResult;
 
     @ManyToOne
     @JoinColumn(name = "result_id", insertable = false, updatable = false)
     @JsonIgnore
     private LabTestResult results;
 
+    @ManyToOne
+    @JoinColumn(name = "field_id", insertable = false, updatable = false)
+    @JsonIgnore
+    private TestFields testFields;
+
 }
+
+

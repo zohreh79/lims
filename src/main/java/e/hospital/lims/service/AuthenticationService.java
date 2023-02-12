@@ -3,6 +3,7 @@ package e.hospital.lims.service;
 import e.hospital.lims.domain.SystemRole;
 import e.hospital.lims.model.UserRequestModel;
 import e.hospital.lims.model.UserResponseModel;
+import io.jsonwebtoken.Claims;
 
 public interface AuthenticationService {
 
@@ -17,4 +18,6 @@ public interface AuthenticationService {
     UserResponseModel login(UserRequestModel model);
 
     SystemRole authenticate(UserRequestModel loginModel);
+
+    Claims getAllClaimsFromToken(String token);
 }

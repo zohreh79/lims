@@ -1,5 +1,6 @@
 package e.hospital.lims.controller;
 
+import e.hospital.lims.domain.TestStatus;
 import e.hospital.lims.model.LabTestModel;
 import e.hospital.lims.service.LabTestService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -24,11 +25,6 @@ public class LabTestController {
         return labTestService.getTestResult(id);
     }
 
-    @PutMapping("/set-result")
-    public ResponseEntity<String> updateLabTestResult(@RequestBody LabTestModel labTestRequestModel) {
-        labTestService.updateTestResult(labTestRequestModel);
-        return ResponseEntity.ok("test updated!");
-    }
 
     @PostMapping("/set-result")
     public ResponseEntity<String> setLabTestResult(@RequestBody LabTestModel labTestModel) {
@@ -40,6 +36,12 @@ public class LabTestController {
     public ResponseEntity<String> setLabTest(@RequestBody LabTestModel labTestRequestModel) {
         labTestService.setTest(labTestRequestModel);
         return ResponseEntity.ok("test request sent!");
+    }
+
+    @PutMapping("/update-status")
+    public ResponseEntity<String> updateStatus(@RequestParam(value = "resultId") Long resultId, @RequestParam(value = "status") TestStatus testStatus) {
+        labTestService.updateTestStatus(resultId, testStatus);
+        return ResponseEntity.ok("status updated!");
     }
 
 }

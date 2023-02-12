@@ -2,12 +2,12 @@ package e.hospital.lims.model;
 
 import e.hospital.lims.domain.Gender;
 import jakarta.validation.constraints.NotEmpty;
-import lombok.Builder;
 import lombok.Data;
 
 @Data
 public class PatientInfo {
 
+    private Long patientId;
     @NotEmpty
     private String patientName;
     @NotEmpty

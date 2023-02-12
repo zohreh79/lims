@@ -15,6 +15,7 @@ public class LabTestResult {
 
     @Id
     @Column(name = "result_id")
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long resultId;
 
     @Column(name = "description")
