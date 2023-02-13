@@ -6,7 +6,9 @@ import e.hospital.lims.domain.User;
 import e.hospital.lims.model.UserRequestModel;
 import e.hospital.lims.model.UserResponseModel;
 import e.hospital.lims.service.AuthenticationService;
+import e.hospital.lims.service.Errors.BadRequest;
 import e.hospital.lims.service.Errors.Forbidden;
+import e.hospital.lims.service.SharedException;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.JwtException;
 import io.jsonwebtoken.Jwts;
@@ -71,7 +73,7 @@ public class AuthenticationServiceImpl implements AuthenticationService {
         try {
             userDao.save(user);
         } catch (Exception e) {
-            throw new BadCredentialsException("error on creating user!");
+            throw new SharedException(SharedException.BadRequest);
         }
         return UserResponseModel
                 .from(generateAccessToken(model.getUsername(), model.getLoginAs())
