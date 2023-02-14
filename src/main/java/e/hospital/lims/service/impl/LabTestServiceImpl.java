@@ -42,7 +42,7 @@ public class LabTestServiceImpl implements LabTestService {
             List<LabTestModel> labTestModelList = new ArrayList<>();
             labTestResultDao.findAll().forEach(
                     labTestResult -> {
-                        testModel.setTestFields(labTestResult.getTestFields());
+//                        testModel.setTestFields(labTestResult.getTestFields());
                         testModel.setDescription(labTestResult.getDescription());
                         testModel.setTestStatus(labTestResult.getTestStatus());
                         testModel.setResultId(labTestResult.getResultId());
@@ -77,7 +77,7 @@ public class LabTestServiceImpl implements LabTestService {
 
         LabTestModel testModel = new LabTestModel();
         testModel.setResultId(labTestResult.getResultId());
-        testModel.setTestFields(labTestResult.getTestFields());
+//        testModel.setTestFields(labTestResult.getTestFields());
         testModel.setDescription(labTestResult.getDescription());
         testModel.setTestStatus(labTestResult.getTestStatus());
         testModel.setGender(patient.getGender());

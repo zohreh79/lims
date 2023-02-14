@@ -1,8 +1,11 @@
 package e.hospital.lims.service.impl;
 
+import e.hospital.lims.dao.DoctorDao;
 import e.hospital.lims.dao.UserDao;
+import e.hospital.lims.domain.Doctor;
 import e.hospital.lims.domain.SystemRole;
 import e.hospital.lims.domain.User;
+import e.hospital.lims.model.DrModel;
 import e.hospital.lims.model.UserRequestModel;
 import e.hospital.lims.model.UserResponseModel;
 import e.hospital.lims.service.AuthenticationService;
@@ -37,6 +40,8 @@ public class AuthenticationServiceImpl implements AuthenticationService {
     private UserDao userDao;
 
     @Autowired
+    private DoctorDao doctorDao;
+    @Autowired
     private PasswordEncoder passwordEncoder;
 
     @Autowired
@@ -44,12 +49,12 @@ public class AuthenticationServiceImpl implements AuthenticationService {
 
     @Override
     public String generateAccessToken(String username, SystemRole role) {
-        return generateToken(username, 1800, role);
+        return generateToken(username, 180000, role);
     }
 
     @Override
     public String generateRefreshToken(String username, SystemRole role) {
-        long refreshTime = 3000;
+        long refreshTime = 300000;
         return generateToken(username, refreshTime, role);
     }
 
@@ -82,17 +87,37 @@ public class AuthenticationServiceImpl implements AuthenticationService {
     }
 
     @Override
+    public ResponseEntity<?> profile(DrModel model) {
+        User user = userDao.findUserByUsername(model.getUsername());
+        if (user == null)
+            return new ResponseEntity<>("User not found", HttpStatus.NOT_FOUND);
+        var doctor = Doctor.builder()
+                .name(model.getDrName())
+                .user(user)
+                .build();
+
+        doctorDao.save(doctor);
+        return new ResponseEntity<>("profile created", HttpStatus.OK);
+    }
+
+    @Override
     public ResponseEntity<?> login(UserRequestModel model) {
         try {
             if (!model.getLoginAs().equals(SystemRole.BIOLOGIST) && !model.getLoginAs().equals(SystemRole.PHYSICIAN))
                 return new ResponseEntity<>("Role not allowed", HttpStatus.FORBIDDEN);
+
+            Authentication authentication = authenticationManager.authenticate(
+                    new UsernamePasswordAuthenticationToken(model.getUsername(), model.getPassword()));
+            SecurityContextHolder.getContext().setAuthentication(authentication);
+            if (authentication == null) {
+                return new ResponseEntity<>("Username or password not found", HttpStatus.NOT_FOUND);
+            }
+            return ResponseEntity.ok(UserResponseModel
+                    .from(generateAccessToken(model.getUsername(), model.getLoginAs())
+                            , generateRefreshToken(model.getUsername(), model.getLoginAs())));
         } catch (Exception e) {
-            return new ResponseEntity<>("Role not allowed", HttpStatus.FORBIDDEN);
+            return new ResponseEntity<>("Username or password not found", HttpStatus.NOT_FOUND);
         }
-        SystemRole role = authenticate(model);
-        return ResponseEntity.ok(UserResponseModel
-                .from(generateAccessToken(model.getUsername(), role)
-                        , generateRefreshToken(model.getUsername(), role)));
     }
 
     public Claims getAllClaimsFromToken(String token) {
@@ -105,6 +130,7 @@ public class AuthenticationServiceImpl implements AuthenticationService {
     private String generateToken(String subject, long expirationInSeconds, SystemRole roles) {
         Map<String, Object> claims = new HashMap<>();
         claims.put("Role", roles);
+        claims.put("User", subject);
         return Jwts.builder()
                 .setSubject(subject)
                 .setClaims(claims)
@@ -112,15 +138,5 @@ public class AuthenticationServiceImpl implements AuthenticationService {
                 .setIssuedAt(new Date(System.currentTimeMillis()))
                 .setExpiration(new Date(System.currentTimeMillis() + expirationInSeconds * 1000))
                 .compact();
-    }
-
-    public SystemRole authenticate(UserRequestModel loginModel) {
-        Authentication authentication = authenticationManager.authenticate(
-                new UsernamePasswordAuthenticationToken(loginModel.getUsername(), loginModel.getPassword()));
-        SecurityContextHolder.getContext().setAuthentication(authentication);
-        if (authentication == null) {
-            throw new UsernameNotFoundException("");
-        }
-        return loginModel.getLoginAs();
     }
 }

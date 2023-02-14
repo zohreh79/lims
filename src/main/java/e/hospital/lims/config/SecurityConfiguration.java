@@ -30,11 +30,8 @@ public class SecurityConfiguration {
                 .formLogin().disable()
                 .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS)
                 .and()
-                .exceptionHandling()
-                .authenticationEntryPoint((req, rsp, e) -> rsp.sendError(HttpServletResponse.SC_UNAUTHORIZED))
-                .and()
                 .authorizeHttpRequests((requests) -> requests
-                        .requestMatchers("/api/auth/**")
+                        .requestMatchers("/api/**")
                         .permitAll()
                         .anyRequest()
                         .authenticated())

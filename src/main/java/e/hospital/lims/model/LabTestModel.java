@@ -14,7 +14,7 @@ public class LabTestModel extends PatientInfo{
     @NotEmpty
     private Long resultId;
 
-    private List<LabTests> testFields;
+//    private List<LabTests> testFields;
     private List<Result> results;
     private ArrayList<String> selectedTestFields;
     private String description;

@@ -1,5 +1,6 @@
 package e.hospital.lims.controller;
 
+import e.hospital.lims.model.DrModel;
 import e.hospital.lims.model.UserRequestModel;
 import e.hospital.lims.model.UserResponseModel;
 import e.hospital.lims.service.AuthenticationService;
@@ -22,6 +23,11 @@ public class AuthenticationController {
     @PostMapping("/register")
     public ResponseEntity<?> register(@RequestBody UserRequestModel model) {
         return authenticationService.register(model);
+    }
+
+    @PostMapping("/profile")
+    public ResponseEntity<?> profile(@RequestBody DrModel model) {
+        return authenticationService.profile(model);
     }
 
 

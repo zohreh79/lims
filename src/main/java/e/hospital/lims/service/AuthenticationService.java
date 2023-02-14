@@ -1,6 +1,7 @@
 package e.hospital.lims.service;
 
 import e.hospital.lims.domain.SystemRole;
+import e.hospital.lims.model.DrModel;
 import e.hospital.lims.model.UserRequestModel;
 import io.jsonwebtoken.Claims;
 import org.springframework.http.ResponseEntity;
@@ -14,6 +15,8 @@ public interface AuthenticationService {
     boolean isTokenValid(String token);
 
     ResponseEntity<?> register(UserRequestModel model);
+
+    ResponseEntity<?> profile(DrModel model);
 
     ResponseEntity<?> login(UserRequestModel model);
 
