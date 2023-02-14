@@ -14,8 +14,9 @@ import io.jsonwebtoken.JwtException;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
-import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -64,7 +65,7 @@ public class AuthenticationServiceImpl implements AuthenticationService {
 
 
     @Override
-    public UserResponseModel register(UserRequestModel model) {
+    public ResponseEntity<?> register(UserRequestModel model) {
         var user = User.builder()
                 .username(model.getUsername())
                 .password(passwordEncoder.encode(model.getPassword()))
@@ -73,22 +74,25 @@ public class AuthenticationServiceImpl implements AuthenticationService {
         try {
             userDao.save(user);
         } catch (Exception e) {
-            throw new SharedException(SharedException.BadRequest);
+            return new ResponseEntity<>("Username already exists!", HttpStatus.BAD_REQUEST);
         }
-        return UserResponseModel
+        return ResponseEntity.ok(UserResponseModel
                 .from(generateAccessToken(model.getUsername(), model.getLoginAs())
-                        , generateRefreshToken(model.getUsername(), model.getLoginAs()));
+                        , generateRefreshToken(model.getUsername(), model.getLoginAs())));
     }
 
     @Override
-    public UserResponseModel login(UserRequestModel model) {
-        if (!model.getLoginAs().equals(SystemRole.BIOLOGIST) && !model.getLoginAs().equals(SystemRole.PHYSICIAN)) {
-            throw new Forbidden("Role not allowed");
+    public ResponseEntity<?> login(UserRequestModel model) {
+        try {
+            if (!model.getLoginAs().equals(SystemRole.BIOLOGIST) && !model.getLoginAs().equals(SystemRole.PHYSICIAN))
+                return new ResponseEntity<>("Role not allowed", HttpStatus.FORBIDDEN);
+        } catch (Exception e) {
+            return new ResponseEntity<>("Role not allowed", HttpStatus.FORBIDDEN);
         }
         SystemRole role = authenticate(model);
-        return UserResponseModel
+        return ResponseEntity.ok(UserResponseModel
                 .from(generateAccessToken(model.getUsername(), role)
-                        , generateRefreshToken(model.getUsername(), role));
+                        , generateRefreshToken(model.getUsername(), role)));
     }
 
     public Claims getAllClaimsFromToken(String token) {
