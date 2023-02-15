@@ -2,13 +2,11 @@ package e.hospital.lims.service.impl;
 
 import e.hospital.lims.dao.*;
 import e.hospital.lims.domain.*;
-import e.hospital.lims.model.CurrentUser;
-import e.hospital.lims.model.LabTestModel;
-import e.hospital.lims.model.Result;
-import e.hospital.lims.model.UpdateStatusModel;
+import e.hospital.lims.model.*;
 import e.hospital.lims.service.Errors.BadRequest;
 import e.hospital.lims.service.Errors.NotFound;
 import e.hospital.lims.service.LabTestService;
+import e.hospital.lims.service.NotificationService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -35,6 +33,9 @@ public class LabTestServiceImpl implements LabTestService {
 
     @Autowired
     private DoctorDao doctorDao;
+
+    @Autowired
+    private NotificationService notificationService;
 
     @Override
     public List<LabTestModel> getAllTests() {
@@ -136,6 +137,14 @@ public class LabTestServiceImpl implements LabTestService {
             }
         }
         labTestResultDao.save(labTestResult);
+        NotificationModel notificationModel=NotificationModel.builder()
+                .message(model.getDescription())
+                .patientId(patient.getPatientId())
+                .receiver(doctor.getName())
+                .title("new Test")
+                .topic(doctor.getName())
+                .build();
+        sendNotification(notificationModel);
     }
 
     @Override
@@ -159,6 +168,17 @@ public class LabTestServiceImpl implements LabTestService {
         labTestResult.setTestStatus(model.getTestStatus());
 
         labTestResultDao.save(labTestResult);
+
+        Doctor doctor = doctorDao.findById(currentUser.getDoctorId())
+                .orElseThrow(() -> new NotFound("Doctor id invalid"));
+        NotificationModel notificationModel=NotificationModel.builder()
+                .message(model.getDescription())
+                .patientId(labTestResult.getPatientId())
+                .receiver(doctor.getName())
+                .title("new Test result")
+                .topic(doctor.getName())
+                .build();
+        sendNotification(notificationModel);
     }
 
 
@@ -168,7 +188,10 @@ public class LabTestServiceImpl implements LabTestService {
                 labTestResultDao.findById(model.getResultId())
                         .orElseThrow(() -> new NotFound("Test not found"));
         labTestResult.setTestStatus(model.getTestStatus());
-
         labTestResultDao.save(labTestResult);
+    }
+
+    private void sendNotification(NotificationModel model){
+        notificationService.sendNotification(model);
     }
 }
