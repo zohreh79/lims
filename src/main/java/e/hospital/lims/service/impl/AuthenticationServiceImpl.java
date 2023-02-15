@@ -11,7 +11,7 @@ import e.hospital.lims.model.UserResponseModel;
 import e.hospital.lims.service.AuthenticationService;
 import e.hospital.lims.service.Errors.BadRequest;
 import e.hospital.lims.service.Errors.Forbidden;
-import e.hospital.lims.service.SharedException;
+import e.hospital.lims.service.Errors.NotFound;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.JwtException;
 import io.jsonwebtoken.Jwts;
@@ -23,7 +23,6 @@ import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -79,7 +78,7 @@ public class AuthenticationServiceImpl implements AuthenticationService {
         try {
             userDao.save(user);
         } catch (Exception e) {
-            return new ResponseEntity<>("Username already exists!", HttpStatus.BAD_REQUEST);
+            throw new BadRequest("Username already exists!");
         }
         return ResponseEntity.ok(UserResponseModel
                 .from(generateAccessToken(model.getUsername(), model.getLoginAs())
@@ -90,7 +89,7 @@ public class AuthenticationServiceImpl implements AuthenticationService {
     public ResponseEntity<?> profile(DrModel model) {
         User user = userDao.findUserByUsername(model.getUsername());
         if (user == null)
-            return new ResponseEntity<>("User not found", HttpStatus.NOT_FOUND);
+            throw new NotFound("User not found");
         var doctor = Doctor.builder()
                 .name(model.getDrName())
                 .user(user)
@@ -103,20 +102,20 @@ public class AuthenticationServiceImpl implements AuthenticationService {
     @Override
     public ResponseEntity<?> login(UserRequestModel model) {
         try {
-            if (!model.getLoginAs().equals(SystemRole.BIOLOGIST) && !model.getLoginAs().equals(SystemRole.PHYSICIAN))
-                return new ResponseEntity<>("Role not allowed", HttpStatus.FORBIDDEN);
+            if (!model.getLoginAs().equals(SystemRole.PATHOBIOLOGIST) && !model.getLoginAs().equals(SystemRole.PHYSICIAN))
+                throw new Forbidden("Role not allowed");
 
             Authentication authentication = authenticationManager.authenticate(
                     new UsernamePasswordAuthenticationToken(model.getUsername(), model.getPassword()));
             SecurityContextHolder.getContext().setAuthentication(authentication);
             if (authentication == null) {
-                return new ResponseEntity<>("Username or password not found", HttpStatus.NOT_FOUND);
+                throw new NotFound("Username or password not found");
             }
             return ResponseEntity.ok(UserResponseModel
                     .from(generateAccessToken(model.getUsername(), model.getLoginAs())
                             , generateRefreshToken(model.getUsername(), model.getLoginAs())));
         } catch (Exception e) {
-            return new ResponseEntity<>("Username or password not found", HttpStatus.NOT_FOUND);
+            throw new NotFound("Username or password not found");
         }
     }
 

@@ -1,17 +1,15 @@
 package e.hospital.lims.domain;
 
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
 import java.util.List;
 
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-@Data
+@Getter
+@Setter
 @Entity
 @Table(name = "doctors")
 public class Doctor {
@@ -28,7 +26,4 @@ public class Doctor {
     @JoinColumn(name = "user_id")
     private User user;
 
-    @OneToMany
-    @JoinColumn(name = "result_id")
-    private List<LabTestResult> items;
 }

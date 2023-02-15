@@ -3,7 +3,6 @@ package e.hospital.lims.domain;
 import jakarta.persistence.*;
 import lombok.*;
 
-import java.util.List;
 
 @Builder
 @NoArgsConstructor
@@ -25,14 +24,10 @@ public class LabTestResult {
     @Enumerated(EnumType.ORDINAL)
     private TestStatus testStatus;
 
-    @ManyToOne
-    @JoinColumn(name = "patient_id", insertable = false, updatable = false)
-    private Patient patient;
+    @JoinColumn(name = "patient_id")
+    private Long patientId;
 
-    @ManyToOne
-    @JoinColumn(name = "doctor_id", insertable = false, updatable = false)
-    private Doctor doctor;
+    @JoinColumn(name = "doctor_id")
+    private Long doctorId;
 
-    @OneToMany
-    private List<LabTests> testFields;
 }

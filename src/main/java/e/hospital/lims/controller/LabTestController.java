@@ -1,7 +1,7 @@
 package e.hospital.lims.controller;
 
-import e.hospital.lims.domain.TestStatus;
 import e.hospital.lims.model.LabTestModel;
+import e.hospital.lims.model.UpdateStatusModel;
 import e.hospital.lims.service.LabTestService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -39,8 +39,8 @@ public class LabTestController {
     }
 
     @PutMapping("/update-status")
-    public ResponseEntity<String> updateStatus(@RequestParam(value = "resultId") Long resultId, @RequestParam(value = "status") TestStatus testStatus) {
-        labTestService.updateTestStatus(resultId, testStatus);
+    public ResponseEntity<String> updateStatus(@RequestBody UpdateStatusModel model) {
+        labTestService.updateTestStatus(model);
         return ResponseEntity.ok("status updated!");
     }
 

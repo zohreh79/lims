@@ -5,6 +5,7 @@ import e.hospital.lims.domain.*;
 import e.hospital.lims.model.CurrentUser;
 import e.hospital.lims.model.LabTestModel;
 import e.hospital.lims.model.Result;
+import e.hospital.lims.model.UpdateStatusModel;
 import e.hospital.lims.service.Errors.BadRequest;
 import e.hospital.lims.service.Errors.NotFound;
 import e.hospital.lims.service.LabTestService;
@@ -42,26 +43,38 @@ public class LabTestServiceImpl implements LabTestService {
             List<LabTestModel> labTestModelList = new ArrayList<>();
             labTestResultDao.findAll().forEach(
                     labTestResult -> {
-//                        testModel.setTestFields(labTestResult.getTestFields());
                         testModel.setDescription(labTestResult.getDescription());
                         testModel.setTestStatus(labTestResult.getTestStatus());
                         testModel.setResultId(labTestResult.getResultId());
 
                         Patient patient = patientDao
-                                .findByPatientId(labTestResult.getPatient().getPatientId());
+                                .findByPatientId(labTestResult.getPatientId());
                         if (patient == null) throw new NotFound("Patient not found!");
 
+                        testModel.setPatientId(patient.getPatientId());
                         testModel.setGender(patient.getGender());
                         testModel.setInitialSymptoms(patient.getInitialSymptoms());
                         testModel.setPatientName(patient.getPatientName());
                         testModel.setAge(patient.getAge());
+
+                        List<LabTests> labTests = labTestDao.findByResultId(labTestResult.getResultId());
+                        if (labTests == null) throw new NotFound("Results not found");
+
+                        List<Result> results = new ArrayList<>();
+                        for (LabTests result : labTests) {
+                            TestFields testFields = testFieldsDao.findByFieldId(result.getFieldsId());
+                            if (testFields == null) throw new NotFound("Field not found");
+
+                            results.add(new Result(testFields.getTestName(), result.getTestResult()));
+                        }
+                        testModel.setResults(results);
 
                         labTestModelList.add(testModel);
                     }
             );
             return labTestModelList;
         } catch (Exception e) {
-            throw new BadRequest("Error on finding tests" + e.getMessage());
+            throw new BadRequest("Error on finding tests => " + e.getMessage());
         }
     }
 
@@ -72,12 +85,12 @@ public class LabTestServiceImpl implements LabTestService {
         if (patient == null) throw new NotFound("Patient not found!");
 
         LabTestResult labTestResult = labTestResultDao
-                .findByPatient(patient);
+                .findByPatientId(patient.getPatientId());
         if (labTestResult == null) throw new NotFound("Test result not found!");
 
         LabTestModel testModel = new LabTestModel();
         testModel.setResultId(labTestResult.getResultId());
-//        testModel.setTestFields(labTestResult.getTestFields());
+        testModel.setPatientId(patientId);
         testModel.setDescription(labTestResult.getDescription());
         testModel.setTestStatus(labTestResult.getTestStatus());
         testModel.setGender(patient.getGender());
@@ -90,15 +103,6 @@ public class LabTestServiceImpl implements LabTestService {
 
     @Override
     public void setTest(LabTestModel model) {
-        List<LabTests> labTests = new ArrayList<>();
-        for (String testField : model.getSelectedTestFields()) {
-            var fields = testFieldsDao.findByTestName(testField);
-            if (fields != null) {
-                labTests.add(LabTests.builder()
-                        .testFields(fields)
-                        .build());
-            }
-        }
         Patient patient = patientDao.findByPatientName(model.getPatientName());
         if (patient == null) {
             patient = Patient.builder()
@@ -112,36 +116,45 @@ public class LabTestServiceImpl implements LabTestService {
         Doctor doctor = doctorDao.findById(currentUser.getDoctorId())
                 .orElseThrow(() -> new NotFound("Doctor id invalid"));
 
-        LabTestResult labTestResult = LabTestResult.builder()
-                .testFields(labTests)
-                .testStatus(model.getTestStatus())
-                .description(model.getDescription())
-                .doctor(doctor)
-                .patient(patient)
-                .build();
+        LabTestResult labTestResult = new LabTestResult();
 
+        labTestResult.setTestStatus(model.getTestStatus());
+        labTestResult.setDescription(model.getDescription());
+
+        labTestResult.setDoctorId(doctor.getDoctorId());
+        labTestResult.setPatientId(patient.getPatientId());
+
+        LabTests labTests = new LabTests();
+        for (String testField : model.getSelectedTestFields()) {
+            var fields = testFieldsDao.findByTestName(testField);
+            if (fields != null) {
+                LabTests.builder()
+                        .fieldsId(fields.getFieldId())
+                        .resultId(labTestResult.getResultId())
+                        .build();
+                labTestDao.save(labTests);
+            }
+        }
         labTestResultDao.save(labTestResult);
-
     }
 
     @Override
     public void setTestResult(LabTestModel model) {
         LabTestResult labTestResult =
-                labTestResultDao.findById(model.getResultId())
-                        .orElseThrow(() -> new NotFound("Test not found"));
+                labTestResultDao.findByResultId(model.getResultId());
 
-        List<LabTests> labTestsList = new ArrayList<>();
+        if (labTestResult == null) throw new NotFound("Test not found");
+
         for (Result result : model.getResults()) {
             TestFields testFields = testFieldsDao.findByTestName(result.getTestName());
 
-            LabTests labTests = labTestDao.findByTestFields(testFields);
-            if (labTests == null) throw new NotFound("Test not found");
-
+            LabTests labTests = new LabTests();
             labTests.setTestResult(result.getResult());
-            labTestsList.add(labTests);
+            labTests.setResultId(labTestResult.getResultId());
+            labTests.setFieldsId(testFields.getFieldId());
+            labTestDao.save(labTests);
         }
 
-        labTestResult.setTestFields(labTestsList);
         labTestResult.setDescription(model.getDescription());
         labTestResult.setTestStatus(model.getTestStatus());
 
@@ -150,11 +163,11 @@ public class LabTestServiceImpl implements LabTestService {
 
 
     @Override
-    public void updateTestStatus(Long resultId, TestStatus testStatus) {
+    public void updateTestStatus(UpdateStatusModel model) {
         LabTestResult labTestResult =
-                labTestResultDao.findById(resultId)
+                labTestResultDao.findById(model.getResultId())
                         .orElseThrow(() -> new NotFound("Test not found"));
-        labTestResult.setTestStatus(testStatus);
+        labTestResult.setTestStatus(model.getTestStatus());
 
         labTestResultDao.save(labTestResult);
     }

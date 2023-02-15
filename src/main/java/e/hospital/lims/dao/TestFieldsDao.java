@@ -8,4 +8,6 @@ import org.springframework.stereotype.Repository;
 public interface TestFieldsDao extends CrudRepository<TestFields, Long> {
 
     TestFields findByTestName(String testName);
+
+    TestFields findByFieldId(Long fieldId);
 }

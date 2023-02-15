@@ -9,7 +9,10 @@ import java.util.List;
 
 @Repository
 public interface LabTestDao extends JpaRepository<LabTests,Long> {
-    LabTests findByTestFields(TestFields testFields);
+
+    LabTests findByFieldsId(Long testFields);
+
+    List<LabTests> findByResultId(Long resultId);
 
 
 }

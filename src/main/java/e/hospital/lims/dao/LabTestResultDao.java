@@ -7,5 +7,8 @@ import org.springframework.stereotype.Repository;
 
 @Repository
 public interface LabTestResultDao extends JpaRepository<LabTestResult, Long> {
-    LabTestResult findByPatient(Patient patient);
+
+    LabTestResult findByPatientId(Long patientId);
+
+    LabTestResult findByResultId(Long resultId);
 }

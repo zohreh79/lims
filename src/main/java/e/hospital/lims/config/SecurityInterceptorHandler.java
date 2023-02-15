@@ -44,15 +44,15 @@ public class SecurityInterceptorHandler implements HandlerInterceptor {
         String accessToken = request.getHeader(HttpHeaders.AUTHORIZATION);
         if (accessToken != null) {
 //            if (authenticationService.isTokenValid(accessToken)) {
-                Claims tokenClaims = authenticationService.getAllClaimsFromToken(accessToken);
-                User user = userDao.findUserByUsername(tokenClaims.get("User").toString());
-                if (user == null) throw new NotFound("User not found!");
+            Claims tokenClaims = authenticationService.getAllClaimsFromToken(accessToken);
+            User user = userDao.findUserByUsername(tokenClaims.get("User").toString());
+            if (user == null) throw new NotFound("User not found!");
 
-                Doctor doctor = doctorDao.findByUser(user);
-                if (doctor == null) throw new NotFound("not found!");
+            Doctor doctor = doctorDao.findByUser(user);
+            if (doctor == null) throw new NotFound("not found!");
 
-                currentUser.setRole(user.getRole());
-                currentUser.setDoctorId(doctor.getDoctorId());
+            currentUser.setRole(user.getRole());
+            currentUser.setDoctorId(doctor.getDoctorId());
 //            } else throw new Unauthorized("access to this path needs valid jwt token , please login again");
         } else throw new Unauthorized("access to this path needs jwt token");
         return HandlerInterceptor.super.preHandle(request, response, handler);

@@ -4,7 +4,6 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.Data;
 
-import java.util.List;
 
 @Data
 @Entity
@@ -20,9 +19,9 @@ public class TestFields {
     @Column(name = "test_name")
     private String testName;
 
-    @Column(name = "normal_range")
-    private String range;
+    @Column(name = "male_normal_range")
+    private String maleRange;
 
-    @OneToMany
-    private List<LabTests> testFieldsResult;
+    @Column(name = "female_normal_range")
+    private String femaleRange;
 }

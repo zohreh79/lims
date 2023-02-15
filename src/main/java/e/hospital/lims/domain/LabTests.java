@@ -24,15 +24,13 @@ public class LabTests {
     @Column(name = "result")
     private String testResult;
 
-    @ManyToOne
-    @JoinColumn(name = "result_id", insertable = false, updatable = false)
+    @JoinColumn(name = "result_id")
     @JsonIgnore
-    private LabTestResult results;
+    private Long resultId;
 
-    @ManyToOne
-    @JoinColumn(name = "field_id", insertable = false, updatable = false)
+    @JoinColumn(name = "fields_id")
     @JsonIgnore
-    private TestFields testFields;
+    private Long fieldsId;
 
 }
 

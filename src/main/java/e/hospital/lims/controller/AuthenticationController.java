@@ -2,7 +2,6 @@ package e.hospital.lims.controller;
 
 import e.hospital.lims.model.DrModel;
 import e.hospital.lims.model.UserRequestModel;
-import e.hospital.lims.model.UserResponseModel;
 import e.hospital.lims.service.AuthenticationService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
