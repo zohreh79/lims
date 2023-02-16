@@ -42,7 +42,8 @@ public class SecurityInterceptorHandler implements HandlerInterceptor {
 
     private boolean intercept(HttpServletRequest request, HttpServletResponse response, Object handler) throws Exception {
         String accessToken = request.getHeader(HttpHeaders.AUTHORIZATION);
-        if (accessToken != null) {
+        String refreshToken = request.getHeader("Refresh");
+        if (accessToken != null && refreshToken !=null) {
 //            if (authenticationService.isTokenValid(accessToken)) {
             Claims tokenClaims = authenticationService.getAllClaimsFromToken(accessToken);
             User user = userDao.findUserByUsername(tokenClaims.get("User").toString());
@@ -54,7 +55,7 @@ public class SecurityInterceptorHandler implements HandlerInterceptor {
             currentUser.setRole(user.getRole());
             currentUser.setDoctorId(doctor.getDoctorId());
 //            } else throw new Unauthorized("access to this path needs valid jwt token , please login again");
-        } else throw new Unauthorized("access to this path needs jwt token");
+        } else throw new Unauthorized("access to this path needs jwt access and refresh token");
         return HandlerInterceptor.super.preHandle(request, response, handler);
     }
 }

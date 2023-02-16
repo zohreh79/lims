@@ -66,7 +66,12 @@ public class LabTestServiceImpl implements LabTestService {
                             TestFields testFields = testFieldsDao.findByFieldId(result.getFieldsId());
                             if (testFields == null) throw new NotFound("Field not found");
 
-                            results.add(new Result(testFields.getTestName(), result.getTestResult()));
+                            results.add(new Result(
+                                    testFields.getTestName()
+                                    , result.getTestResult()
+                                    , testFields.getMaleRange()
+                                    , testFields.getFemaleRange()
+                            ));
                         }
                         testModel.setResults(results);
 
@@ -137,7 +142,7 @@ public class LabTestServiceImpl implements LabTestService {
             }
         }
         labTestResultDao.save(labTestResult);
-        NotificationModel notificationModel=NotificationModel.builder()
+        NotificationModel notificationModel = NotificationModel.builder()
                 .message(model.getDescription())
                 .patientId(patient.getPatientId())
                 .receiver(doctor.getName())
@@ -171,7 +176,7 @@ public class LabTestServiceImpl implements LabTestService {
 
         Doctor doctor = doctorDao.findById(currentUser.getDoctorId())
                 .orElseThrow(() -> new NotFound("Doctor id invalid"));
-        NotificationModel notificationModel=NotificationModel.builder()
+        NotificationModel notificationModel = NotificationModel.builder()
                 .message(model.getDescription())
                 .patientId(labTestResult.getPatientId())
                 .receiver(doctor.getName())
@@ -191,7 +196,7 @@ public class LabTestServiceImpl implements LabTestService {
         labTestResultDao.save(labTestResult);
     }
 
-    private void sendNotification(NotificationModel model){
+    private void sendNotification(NotificationModel model) {
         notificationService.sendNotification(model);
     }
 }
