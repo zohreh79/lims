@@ -11,10 +11,8 @@ import e.hospital.lims.service.Errors.Unauthorized;
 import io.jsonwebtoken.Claims;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
-import lombok.SneakyThrows;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
-import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Component;
 import org.springframework.web.servlet.HandlerInterceptor;
 
@@ -44,7 +42,7 @@ public class SecurityInterceptorHandler implements HandlerInterceptor {
         String accessToken = request.getHeader(HttpHeaders.AUTHORIZATION);
         String refreshToken = request.getHeader("Refresh");
         if (accessToken != null && refreshToken !=null) {
-//            if (authenticationService.isTokenValid(accessToken)) {
+            if (authenticationService.isTokenValid(accessToken)) {
             Claims tokenClaims = authenticationService.getAllClaimsFromToken(accessToken);
             User user = userDao.findUserByUsername(tokenClaims.get("User").toString());
             if (user == null) throw new NotFound("User not found!");
@@ -54,7 +52,7 @@ public class SecurityInterceptorHandler implements HandlerInterceptor {
 
             currentUser.setRole(user.getRole());
             currentUser.setDoctorId(doctor.getDoctorId());
-//            } else throw new Unauthorized("access to this path needs valid jwt token , please login again");
+            } else throw new Unauthorized("access to this path needs valid jwt token , please login again");
         } else throw new Unauthorized("access to this path needs jwt access and refresh token");
         return HandlerInterceptor.super.preHandle(request, response, handler);
     }
